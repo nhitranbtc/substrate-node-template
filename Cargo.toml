@@ -1,8 +1,6 @@
 [workspace]
 members = [
-    "bin/substrate-node/cli",
-    "bin/substrate-node/rpc",
-    "bin/substrate-node/inspect",
+    "bin/substrate-node",
     "primitives",
     "runtime/development",
     "vendor/evm-tracing",
@@ -61,6 +59,16 @@ default_constructed_unit_structs = { level = "allow", priority = 2 } # stylistic
 [workspace.dependencies]
 # General deps
 # (wasm)
+rand = { version = "0.8.5", default-features = false }
+rand_chacha = { version = "0.3.1", default-features = false }
+rand_core = { version = "0.6.2" }
+rand_distr = { version = "0.4.3" }
+rand_pcg = { version = "0.3.1" }
+rayon = { version = "1.5.1" }
+rbtag = { version = "0.3" }
+ref-cast = { version = "1.0.0" }
+regex = { version = "1.10.2" }
+
 array-bytes = { version = "6.2.2", default-features = false }
 arrayvec = { version = "0.7.4" }
 assert_cmd = { version = "2.0.10" }
@@ -87,26 +95,22 @@ libsecp256k1 = { version = "0.7.0", default-features = false }
 log = { version = "0.4.17", default-features = false }
 nix = { version = "0.28.0" }
 platforms = { version = "3.0" }
-primitive-types = { version = "0.12.0", default-features = false, features = [
-    "codec",
-    "scale-info",
-    "num-traits",
-] }
-proc-macro2 = "1.0"
+
+primitive-types = { version = "0.12.1", default-features = false }
+proc-macro-crate = { version = "3.0.0" }
+proc-macro-warning = { version = "1.0.0", default-features = false }
+proc-macro2 = { version = "1.0.64" }
+procfs = { version = "0.16.0" }
+prometheus = { version = "0.13.0", default-features = false }
+
 quote = "1.0"
-rand = { version = "0.8.5", default-features = false }
-regex = { version = "1.10.2" }
 rlp = "0.5"
-scale-info = { version = "2.5.0", default-features = false, features = [
-    "derive",
-] }
-serde = { version = "1.0.151", default-features = false, features = [
-    "derive",
-    "alloc",
-] }
+
+scale-info = { version = "2.11.1", default-features = false }
+serde = { version = "1.0.197", default-features = false }
 serde-big-array = { version = "0.3.2" }
 serde_derive = { version = "1.0.117" }
-serde_json = { version = "1.0.92", default-features = false }
+serde_json = { version = "1.0.121", default-features = false }
 serde_yaml = { version = "0.9" }
 sha3 = { version = "0.10.1", default-features = false }
 similar-asserts = { version = "1.1.0" }
@@ -375,8 +379,6 @@ runtime-common = { path = "./runtime/common", default-features = false }
 node-template-runtime = { path = "./runtime/development" }
 
 # Default
-node-rpc = { path = "./bin/substrate-node/rpc" }
-node-cli = { path = "./bin/substrate-node/cli", package = "staging-node-cli" }
 node-inspect = { path = "./bin/substrate-node/inspect", package = "staging-node-inspect" }
 node-primitives = { path = "./primitives", default-features = false }
 

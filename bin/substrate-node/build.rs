@@ -17,11 +17,9 @@
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 fn main() {
-	#[cfg(feature = "cli")]
 	cli::main();
 }
 
-#[cfg(feature = "cli")]
 mod cli {
 	include!("src/cli.rs");
 

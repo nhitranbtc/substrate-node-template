@@ -18,15 +18,18 @@
 
 use polkadot_sdk::*;
 
-use super::benchmarking::{inherent_benchmark_data, RemarkBuilder, TransferKeepAliveBuilder};
 use crate::{
-	chain_spec, service,
-	service::{new_partial, FullClient},
-	Cli, Subcommand,
+	cli::{Cli, Subcommand},
+	local::{
+		chain_spec, service,
+		service::{new_partial, FullClient},
+	},
 };
+
+#[cfg(feature = "runtime-benchmarks")]
+use frame_benchmarking_cli::*;
 use node_primitives::Block;
 use node_template_runtime::{ExistentialDeposit, RuntimeApi};
-use frame_benchmarking_cli::*;
 use sc_cli::{Result, SubstrateCli};
 use sc_service::PartialComponents;
 use sp_keyring::Sr25519Keyring;
@@ -61,19 +64,17 @@ impl SubstrateCli for Cli {
 
 	fn load_spec(&self, id: &str) -> std::result::Result<Box<dyn sc_service::ChainSpec>, String> {
 		let spec = match id {
-			"" => {
+			"" =>
 				return Err(
 					"Please specify which chain you want to run, e.g. --dev or --chain=local"
 						.into(),
-				)
-			},
+				),
 			"dev" => Box::new(chain_spec::development_config()),
 			"local" => Box::new(chain_spec::local_testnet_config()),
 			"fir" | "flaming-fir" => Box::new(chain_spec::flaming_fir_config()?),
 			"staging" => Box::new(chain_spec::staging_testnet_config()),
-			path => {
-				Box::new(chain_spec::ChainSpec::from_json_file(std::path::PathBuf::from(path))?)
-			},
+			path =>
+				Box::new(chain_spec::ChainSpec::from_json_file(std::path::PathBuf::from(path))?),
 		};
 		Ok(spec)
 	}
@@ -95,7 +96,12 @@ pub fn run() -> Result<()> {
 
 			runner.sync_run(|config| cmd.run::<Block, RuntimeApi>(config))
 		},
+
+		#[cfg(feature = "runtime-benchmarks")]
 		Some(Subcommand::Benchmark(cmd)) => {
+			use crate::benchmarking::{
+				inherent_benchmark_data, RemarkBuilder, TransferKeepAliveBuilder,
+			};
 			let runner = cli.create_runner(cmd)?;
 
 			runner.sync_run(|config| {

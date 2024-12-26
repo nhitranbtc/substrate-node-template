@@ -1,12 +1,12 @@
 [package]
-name = "staging-node-cli"
+name = "substrate-node-template"
 version = "3.0.0"
 authors.workspace = true
 description = "Generic Substrate node implementation in Rust. (polkadot v1.15.0)"
 build = "build.rs"
 edition.workspace = true
 license = "GPL-3.0-or-later WITH Classpath-exception-2.0"
-default-run = "substrate-node"
+default-run = "substrate-node-template"
 homepage = "https://substrate.io"
 repository.workspace = true
 publish = false
@@ -28,9 +28,8 @@ is-it-maintained-issue-resolution = { repository = "paritytech/polkadot-sdk" }
 is-it-maintained-open-issues = { repository = "paritytech/polkadot-sdk" }
 
 [[bin]]
-name = "substrate-node"
+name = "substrate-node-template"
 path = "bin/main.rs"
-required-features = ["cli"]
 
 [lib]
 crate-type = ["cdylib", "rlib"]
@@ -50,7 +49,6 @@ polkadot-sdk = { features = [
     "node",
 ], workspace = true, default-features = true }
 node-template-runtime.workspace = true
-node-rpc.workspace = true
 node-primitives.workspace = true
 node-primitives.default-features = true
 node-inspect = { optional = true, workspace = true, default-features = true }
@@ -89,6 +87,8 @@ sc-service-test = { workspace = true }
 clap = { optional = true, workspace = true }
 clap_complete = { optional = true, workspace = true }
 node-inspect = { optional = true, workspace = true, default-features = true }
+sc-service = { workspace = true, optional = true }
+
 polkadot-sdk = { features = [
     "frame-benchmarking-cli",
     "sc-cli",
@@ -97,8 +97,14 @@ polkadot-sdk = { features = [
 ], optional = true, workspace = true, default-features = true }
 
 [features]
-default = ["cli"]
-cli = ["clap", "clap_complete", "node-inspect", "polkadot-sdk"]
+default = [
+    "clap",
+    "clap_complete",
+    "node-inspect",
+    "polkadot-sdk",
+    "sc-service/rocksdb",
+]
+
 runtime-benchmarks = [
     "node-template-runtime/runtime-benchmarks",
     "node-inspect?/runtime-benchmarks",

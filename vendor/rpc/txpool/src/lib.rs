@@ -27,8 +27,7 @@ use sha3::{Digest, Keccak256};
 use sp_api::{ApiExt, ProvideRuntimeApi};
 use sp_blockchain::{Error as BlockChainError, HeaderBackend, HeaderMetadata};
 use sp_runtime::traits::Block as BlockT;
-use std::collections::HashMap;
-use std::{marker::PhantomData, sync::Arc};
+use std::{collections::HashMap, marker::PhantomData, sync::Arc};
 
 use moonbeam_rpc_primitives_txpool::{
 	Transaction as TransactionV2, TxPoolResponse, TxPoolRuntimeApi,

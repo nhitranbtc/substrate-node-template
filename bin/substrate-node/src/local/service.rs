@@ -176,7 +176,7 @@ pub fn new_partial(
 		sc_transaction_pool::FullPool<Block, FullClient>,
 		(
 			impl Fn(
-				node_rpc::DenyUnsafe,
+				crate::rpc::DenyUnsafe,
 				sc_rpc::SubscriptionTaskExecutor,
 			) -> Result<jsonrpsee::RpcModule<()>, sc_service::Error>,
 			(
@@ -317,25 +317,25 @@ pub fn new_partial(
 		let rpc_backend = backend.clone();
 		let rpc_statement_store = statement_store.clone();
 		let rpc_extensions_builder =
-			move |deny_unsafe, subscription_executor: node_rpc::SubscriptionTaskExecutor| {
-				let deps = node_rpc::FullDeps {
+			move |deny_unsafe, subscription_executor: crate::rpc::SubscriptionTaskExecutor| {
+				let deps = crate::rpc::FullDeps {
 					client: client.clone(),
 					pool: pool.clone(),
 					select_chain: select_chain.clone(),
 					chain_spec: chain_spec.cloned_box(),
 					deny_unsafe,
-					babe: node_rpc::BabeDeps {
+					babe: crate::rpc::BabeDeps {
 						keystore: keystore.clone(),
 						babe_worker_handle: babe_worker_handle.clone(),
 					},
-					grandpa: node_rpc::GrandpaDeps {
+					grandpa: crate::rpc::GrandpaDeps {
 						shared_voter_state: shared_voter_state.clone(),
 						shared_authority_set: shared_authority_set.clone(),
 						justification_stream: justification_stream.clone(),
 						subscription_executor: subscription_executor.clone(),
 						finality_provider: finality_proof_provider.clone(),
 					},
-					beefy: node_rpc::BeefyDeps::<beefy_primitives::ecdsa_crypto::AuthorityId> {
+					beefy: crate::rpc::BeefyDeps::<beefy_primitives::ecdsa_crypto::AuthorityId> {
 						beefy_finality_proof_stream: beefy_rpc_links
 							.from_voter_justif_stream
 							.clone(),
@@ -349,7 +349,7 @@ pub fn new_partial(
 					mixnet_api: mixnet_api.as_ref().cloned(),
 				};
 
-				node_rpc::create_full(deps).map_err(Into::into)
+				crate::rpc::create_full(deps).map_err(Into::into)
 			};
 
 		(rpc_extensions_builder, shared_voter_state2)

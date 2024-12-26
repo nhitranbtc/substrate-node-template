@@ -29,17 +29,17 @@
 //! hasn't been tested.
 
 #![warn(missing_docs)]
+#![warn(unused_extern_crates)]
 
-#[cfg(feature = "cli")]
+/// Development node support.
+pub mod local;
+
+//#[cfg(feature = "runtime-benchmarks")]
 mod benchmarking;
-pub mod chain_spec;
-#[cfg(feature = "cli")]
-mod cli;
-#[cfg(feature = "cli")]
-mod command;
-pub mod service;
 
-#[cfg(feature = "cli")]
+mod cli;
+mod command;
+mod rpc;
+
 pub use cli::*;
-#[cfg(feature = "cli")]
 pub use command::*;

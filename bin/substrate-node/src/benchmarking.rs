@@ -20,7 +20,7 @@
 //!
 //! Should only be used for benchmarking as it may break in other contexts.
 
-use crate::service::{create_extrinsic, FullClient};
+use crate::local::service::{create_extrinsic, FullClient};
 
 use polkadot_sdk::*;
 
