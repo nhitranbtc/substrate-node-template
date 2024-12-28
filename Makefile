@@ -17,3 +17,8 @@ run:
 .PHONY: release
 release:
 	cargo run --release --package substrate-node-template -- --dev --tmp -lruntime=debug --rpc-external
+
+
+.PHONY: build-upgrade
+build-upgrade:
+	cargo build --release --package substrate-node-template

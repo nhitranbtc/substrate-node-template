@@ -96,8 +96,6 @@ pub struct FullDeps<C, P, SC, B, AuthorityId: AuthorityIdBound> {
 	pub pool: Arc<P>,
 	/// The SelectChain Strategy
 	pub select_chain: SC,
-	/// A copy of the chain spec.
-	pub chain_spec: Box<dyn sc_chain_spec::ChainSpec>,
 	/// Whether to deny unsafe calls
 	pub deny_unsafe: DenyUnsafe,
 	/// BABE specific dependencies.
@@ -120,7 +118,6 @@ pub fn create_full<C, P, SC, B, AuthorityId>(
 		client,
 		pool,
 		select_chain,
-		chain_spec,
 		deny_unsafe,
 		babe,
 		grandpa,
@@ -177,11 +174,6 @@ where
 		finality_provider,
 	} = grandpa;
 
-	let chain_name = chain_spec.name().to_string();
-	let genesis_hash = client.block_hash(0).ok().flatten().expect("Genesis block exists; qed");
-	let properties = chain_spec.properties();
-	io.merge(ChainSpec::new(chain_name, genesis_hash, properties).into_rpc())?;
-
 	io.merge(System::new(client.clone(), pool, deny_unsafe).into_rpc())?;
 	// Making synchronous calls in light client freezes the browser currently,
 	// more context: https://github.com/paritytech/substrate/pull/3480
@@ -200,6 +192,7 @@ where
 		Babe::new(client.clone(), babe_worker_handle.clone(), keystore, select_chain, deny_unsafe)
 			.into_rpc(),
 	)?;
+
 	io.merge(
 		Grandpa::new(
 			subscription_executor,
@@ -210,12 +203,6 @@ where
 		)
 		.into_rpc(),
 	)?;
-
-	io.merge(
-		SyncState::new(chain_spec, client.clone(), shared_authority_set, babe_worker_handle)?
-			.into_rpc(),
-	)?;
-
 	io.merge(StateMigration::new(client.clone(), backend, deny_unsafe).into_rpc())?;
 	io.merge(Dev::new(client, deny_unsafe).into_rpc())?;
 	let statement_store =

@@ -322,7 +322,6 @@ pub fn new_partial(
 					client: client.clone(),
 					pool: pool.clone(),
 					select_chain: select_chain.clone(),
-					chain_spec: chain_spec.cloned_box(),
 					deny_unsafe,
 					babe: crate::rpc::BabeDeps {
 						keystore: keystore.clone(),

@@ -224,6 +224,7 @@ sp-transaction-pool = { default-features = false, git = "https://github.com/pari
 sp-staking = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
 sp-externalities = { git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407", default-features = false }
 sp-version = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
+sp-arithmetic = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
 substrate-frame-rpc-system = { git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
 substrate-state-trie-migration-rpc = { git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
 mmr-rpc = { git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
@@ -375,9 +376,8 @@ fc-storage = { git = "https://github.com/AstarNetwork/frontier", branch = "stabl
 
 
 # Local Runtime
-runtime-common = { path = "./runtime/common", default-features = false }
 node-template-runtime = { path = "./runtime/development" }
-
+runtime-common = { path = "./runtime/common", default-features = false }
 # Default
 node-inspect = { path = "./bin/substrate-node/inspect", package = "staging-node-inspect" }
 node-primitives = { path = "./primitives", default-features = false }

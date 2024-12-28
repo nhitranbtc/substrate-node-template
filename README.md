@@ -82,3 +82,130 @@ make run
 # Run the project in release mode
 make release
 ```
+
+# Add Trusted Nodes
+
+## Tutorial Objectives
+
+By completing this tutorial, you will accomplish the following objectives:
+
+- Generate key pairs for use as a network authority.
+- Create a custom chain specification file.
+- Launch a private two-node blockchain network.
+
+### Generate Session Keys
+
+#### Sr25519 Keys (BABE)
+
+```sh
+# Generate keys with mnemonic
+./target/release/substrate-node-template key generate \
+  --scheme Sr25519 \
+  --password-filename ./bin/substrate-node/res/password.txt
+```
+
+#### Ed25519 Keys (GRANDPA)
+
+```sh
+# Generate keys with same mnemonic
+./target/release/substrate-node-template key inspect \
+  --scheme Ed25519 \
+  --password-filename ./bin/substrate-node/res/password.txt \
+  "<your-mnemonic-phrase>"
+```
+
+### Start Node01
+
+```sh
+./target/release/substrate-node-template \
+  --base-path /tmp/node01 \
+  --chain=./bin/substrate-node/res/customSpecRaw.json \
+  --port 30333 \
+  --rpc-port 9944 \
+  --validator \
+  --rpc-methods Unsafe \
+  --name MyNode01 \
+  --node-key=c12b6d18942f5ee8528c8e2baf4e147b5c5c18710926ea492d09cbd9f6c9f82a
+```
+
+### Start Node02
+
+```sh
+./target/release/substrate-node-template \
+  --base-path /tmp/node02 \
+  --chain=./bin/substrate-node/res/customSpecRaw.json \
+  --port 30334 \
+  --rpc-port 9945 \
+  --validator \
+  --rpc-methods Unsafe \
+  --name MyNode02 \
+  --node-key=6ce3be907dbcabf20a9a5a60a712b4256a54196000a8ed4050d352bc113f8c58 \
+  --bootnodes /ip4/127.0.0.1/tcp/30333/p2p/12D3KooWBmAwcd4PJNJvfV89HwE48nwkRmAgo8Vy3uQEyNNHBox2
+```
+
+### Insert Keys for Node01
+
+```sh
+# Insert BABE key
+./target/release/substrate-node-template key insert \
+  --base-path /tmp/node01 \
+  --chain=./bin/substrate-node/res/customSpecRaw.json \
+  --password-filename ./bin/substrate-node/res/password.txt \
+  --scheme Sr25519 \
+  --key-type babe \
+  --suri "<your-secret-seed>"
+
+# Insert GRANDPA key
+./target/release/substrate-node-template key insert \
+  --base-path /tmp/node01 \
+  --chain=./bin/substrate-node/res/customSpecRaw.json \
+  --password-filename ./bin/substrate-node/res/password.txt \
+  --scheme Ed25519 \
+  --key-type gran \
+  --suri "<your-secret-seed>"
+```
+
+### Restart Node01
+
+### Insert Keys for Node02
+
+```sh
+# Insert BABE key
+./target/release/substrate-node-template key insert \
+  --base-path /tmp/node02 \
+  --chain=./bin/substrate-node/res/customSpecRaw.json \
+  --password-filename ./bin/substrate-node/res/password.txt \
+  --scheme Sr25519 \
+  --key-type babe \
+  --suri "<your-secret-seed>"
+
+# Insert GRANDPA key
+./target/release/substrate-node-template key insert \
+  --base-path /tmp/node02 \
+  --chain=./bin/substrate-node/res/customSpecRaw.json \
+  --password-filename ./bin/substrate-node/res/password.txt \
+  --scheme Ed25519 \
+  --key-type gran \
+  --suri "<your-secret-seed>"
+```
+
+### Restart Node02
+
+## Directory Structure
+
+```sh
+/tmp/
+├── node01/
+│   ├── chains/
+│   │   └── local_testnet/
+│   │       └── keystore/
+│   │
+│   └── keystore/
+│
+└── node02/
+  ├── chains/
+  │   └── local_testnet/
+  │       └── keystore/
+  │
+  └── keystore/
+```

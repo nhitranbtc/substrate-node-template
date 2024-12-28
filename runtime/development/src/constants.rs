@@ -21,12 +21,20 @@
 pub mod currency {
 	use node_primitives::Balance;
 
-	pub const MILLICENTS: Balance = 1_000_000_000;
-	pub const CENTS: Balance = 1_000 * MILLICENTS; // assume this is worth about a cent.
-	pub const DOLLARS: Balance = 100 * CENTS;
+	// pub const MILLICENTS: Balance = 1_000_000_000;
+	// pub const CENTS: Balance = 1_000 * MILLICENTS; // assume this is worth about a cent.
+	// pub const DOLLARS: Balance = 100 * CENTS;
 
+	/// Constant values used within the runtime.
+	pub const MICROAST: Balance = 1_000_000_000_000;
+	pub const MILLIAST: Balance = 1_000 * MICROAST;
+	pub const APPLE: Balance = 1_000 * MILLIAST;
+
+	pub const STORAGE_BYTE_FEE: Balance = 100 * MICROAST;
+
+	/// Charge fee for stored bytes and items.
 	pub const fn deposit(items: u32, bytes: u32) -> Balance {
-		items as Balance * 15 * CENTS + (bytes as Balance) * 6 * CENTS
+		items as Balance * 1 * APPLE + (bytes as Balance) * STORAGE_BYTE_FEE
 	}
 }
 

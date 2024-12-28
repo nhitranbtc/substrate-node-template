@@ -46,7 +46,7 @@ pub use node_template_runtime::RuntimeGenesisConfig;
 type AccountPublic = <Signature as Verify>::Signer;
 
 const STAGING_TELEMETRY_URL: &str = "wss://telemetry.polkadot.io/submit/";
-const ENDOWMENT: Balance = 10_000_000 * DOLLARS;
+const ENDOWMENT: Balance = 10_000_000 * APPLE;
 const STASH: Balance = ENDOWMENT / 1000;
 
 /// Node `ChainSpec` extensions.
@@ -433,8 +433,8 @@ pub fn testnet_genesis(
 			"assets": vec![(9, get_account_id_from_seed::<sr25519::Public>("Alice"), true, 1)],
 		},
 		"nominationPools": {
-			"minCreateBond": 10 * DOLLARS,
-			"minJoinBond": 1 * DOLLARS,
+			"minCreateBond": 10 * APPLE,
+			"minJoinBond": 1 * APPLE,
 		},
 	})
 }
@@ -450,10 +450,15 @@ fn development_config_genesis_json() -> serde_json::Value {
 
 /// Development config (single validator Alice).
 pub fn development_config() -> ChainSpec {
+	let mut properties = serde_json::map::Map::new();
+	properties.insert("tokenSymbol".into(), "APPLE".into());
+	properties.insert("tokenDecimals".into(), 18.into());
+
 	ChainSpec::builder(wasm_binary_unwrap(), Default::default())
 		.with_name("Development")
 		.with_id("dev")
 		.with_chain_type(ChainType::Development)
+		.with_properties(properties)
 		.with_genesis_config_patch(development_config_genesis_json())
 		.build()
 }
@@ -469,10 +474,15 @@ fn local_testnet_genesis() -> serde_json::Value {
 
 /// Local testnet config (multivalidator Alice + Bob).
 pub fn local_testnet_config() -> ChainSpec {
+	let mut properties = serde_json::map::Map::new();
+	properties.insert("tokenSymbol".into(), "APPLE".into());
+	properties.insert("tokenDecimals".into(), 18.into());
+
 	ChainSpec::builder(wasm_binary_unwrap(), Default::default())
 		.with_name("Local Testnet")
 		.with_id("local_testnet")
 		.with_chain_type(ChainType::Local)
+		.with_properties(properties)
 		.with_genesis_config_patch(local_testnet_genesis())
 		.build()
 }
