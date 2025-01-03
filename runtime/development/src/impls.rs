@@ -337,9 +337,9 @@ mod multiplier_tests {
 					iterations,
 					fm,
 					adjusted_fee,
-					adjusted_fee / MILLICENTS,
-					adjusted_fee / CENTS,
-					adjusted_fee / DOLLARS,
+					adjusted_fee / MICROAST,
+					adjusted_fee / MICROAST,
+					adjusted_fee / APPLE,
 				);
 			}
 		});

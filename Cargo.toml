@@ -1,7 +1,9 @@
 [workspace]
 members = [
     "bin/substrate-node",
+    "precompiles/*",
     "primitives",
+    "pallets/unified-accounts",
     "runtime/development",
     "vendor/evm-tracing",
     "vendor/primitives/debug",
@@ -85,6 +87,7 @@ derive_more = { version = "0.99" }
 docify = { version = "0.2.8" }
 environmental = { version = "1.1.2", default-features = false }
 ethers = { version = "2.0.9", default-features = false }
+num_enum = { version = "0.5.3", default-features = false }
 futures = "0.3.21"
 hex = { version = "0.4.3", default-features = false }
 hex-literal = "0.4.1"
@@ -159,171 +162,171 @@ wat = { version = "1.0.0" }
 
 # Substrate
 # (wasm)
-sc-mixnet = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-sc-cli = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-sc-network-common = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-sc-network = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-sc-executor = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-sc-service = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-sc-service-test = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-sc-statement-store = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-sc-telemetry = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-sc-rpc = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-sc-transaction-pool = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-sc-transaction-pool-api = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-sc-utils = { git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-substrate-prometheus-endpoint = { git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-sc-consensus-aura = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-sc-consensus-babe = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-sc-consensus-babe-rpc = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-sc-consensus = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-sc-consensus-beefy = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-sc-consensus-beefy-rpc = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-sc-consensus-grandpa = { default-features = false, package = "sc-consensus-grandpa", git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-sc-consensus-grandpa-rpc = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-sc-client-api = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-sc-rpc-api = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-sc-rpc-spec-v2 = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-sc-basic-authorship = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-sc-network-sync = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-sc-authority-discovery = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-sc-chain-spec = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-sc-sync-state-rpc = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-sc-consensus-slots = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-sp-consensus = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-sp-timestamp = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-sp-keyring = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
+sc-mixnet = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+sc-cli = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+sc-network-common = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+sc-network = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+sc-executor = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+sc-service = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+sc-service-test = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+sc-statement-store = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+sc-telemetry = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+sc-rpc = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+sc-transaction-pool = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+sc-transaction-pool-api = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+sc-utils = { git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+substrate-prometheus-endpoint = { git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+sc-consensus-aura = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+sc-consensus-babe = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+sc-consensus-babe-rpc = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+sc-consensus = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+sc-consensus-beefy = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+sc-consensus-beefy-rpc = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+sc-consensus-grandpa = { default-features = false, package = "sc-consensus-grandpa", git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+sc-consensus-grandpa-rpc = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+sc-client-api = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+sc-rpc-api = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+sc-rpc-spec-v2 = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+sc-basic-authorship = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+sc-network-sync = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+sc-authority-discovery = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+sc-chain-spec = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+sc-sync-state-rpc = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+sc-consensus-slots = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+sp-consensus = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+sp-timestamp = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+sp-keyring = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
 
 # These dependencies are used for the node template's RPCs
-sp-core = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-sp-io = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-sp-runtime = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-sp-std = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-sp-api = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-sp-authority-discovery = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-sp-block-builder = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-sp-blockchain = { git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-sp-consensus-babe = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-sp-consensus-beefy = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-sp-consensus-aura = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-sp-consensus-grandpa = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-sp-keystore = { git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-sp-maybe-compressed-blob = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-sp-metadata-ir = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-sp-mixnet = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-sp-mmr-primitives = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-sp-application-crypto = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-sp-statement-store = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-sp-inherents = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-sp-offchain = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-sp-runtime-interface = { git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407", default-features = false }
-sp-session = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-sp-trie = { git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-sp-transaction-storage-proof = { git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-sp-transaction-pool = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-sp-staking = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-sp-externalities = { git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407", default-features = false }
-sp-version = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-sp-arithmetic = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-substrate-frame-rpc-system = { git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-substrate-state-trie-migration-rpc = { git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-mmr-rpc = { git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-sp-genesis-builder = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
+sp-core = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+sp-io = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+sp-runtime = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+sp-std = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+sp-api = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+sp-authority-discovery = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+sp-block-builder = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+sp-blockchain = { git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+sp-consensus-babe = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+sp-consensus-beefy = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+sp-consensus-aura = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+sp-consensus-grandpa = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+sp-keystore = { git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+sp-maybe-compressed-blob = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+sp-metadata-ir = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+sp-mixnet = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+sp-mmr-primitives = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+sp-application-crypto = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+sp-statement-store = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+sp-inherents = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+sp-offchain = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+sp-runtime-interface = { git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407", default-features = false }
+sp-session = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+sp-trie = { git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+sp-transaction-storage-proof = { git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+sp-transaction-pool = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+sp-staking = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+sp-externalities = { git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407", default-features = false }
+sp-version = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+sp-arithmetic = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+substrate-frame-rpc-system = { git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+substrate-state-trie-migration-rpc = { git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+mmr-rpc = { git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+sp-genesis-builder = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
 
 # frame dependencies
-frame-executive = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-frame-metadata = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-frame-metadata-hash-extension = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
+frame-executive = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+frame-metadata = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+frame-metadata-hash-extension = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
 
-frame-support = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-frame-system = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-frame-election-provider-support = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-frame-system-rpc-runtime-api = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
+frame-support = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+frame-system = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+frame-election-provider-support = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+frame-system-rpc-runtime-api = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
 # Used for runtime benchmarking
-frame-benchmarking = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-frame-system-benchmarking = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-frame-try-runtime = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-frame-benchmarking-cli = { git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
+frame-benchmarking = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+frame-system-benchmarking = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+frame-try-runtime = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+frame-benchmarking-cli = { git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
 # CLI-specific dependencies
 
 # Substrate pallets
 # (wasm)
-pallet-assets = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-pallet-aura = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-pallet-authority-discovery = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-pallet-authorship = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-pallet-alliance = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-pallet-asset-rate = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-#pallet-asset-conversion = {  default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407"}
-pallet-babe = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-pallet-balances = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-pallet-bags-list = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-pallet-bounties = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-pallet-child-bounties = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-pallet-collective = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-pallet-contracts = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-pallet-conviction-voting = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-pallet-core-fellowship = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-pallet-election-provider-multi-phase = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-pallet-elections-phragmen = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-pallet-democracy = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-pallet-fast-unstake = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-pallet-glutton = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-pallet-grandpa = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-pallet-identity = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-pallet-im-online = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-pallet-indices = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-pallet-insecure-randomness-collective-flip = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-pallet-lottery = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-pallet-membership = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-pallet-message-queue = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-pallet-multisig = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-pallet-mmr = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-pallet-nfts = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-pallet-nomination-pools = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-pallet-nomination-pools-runtime-api = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-#pallet-nft-fractionalization = {  default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407"}
+pallet-assets = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+pallet-aura = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+pallet-authority-discovery = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+pallet-authorship = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+pallet-alliance = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+pallet-asset-rate = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+#pallet-asset-conversion = {  default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407"}
+pallet-babe = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+pallet-balances = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+pallet-bags-list = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+pallet-bounties = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+pallet-child-bounties = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+pallet-collective = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+pallet-contracts = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+pallet-conviction-voting = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+pallet-core-fellowship = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+pallet-election-provider-multi-phase = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+pallet-elections-phragmen = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+pallet-democracy = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+pallet-fast-unstake = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+pallet-glutton = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+pallet-grandpa = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+pallet-identity = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+pallet-im-online = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+pallet-indices = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+pallet-insecure-randomness-collective-flip = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+pallet-lottery = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+pallet-membership = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+pallet-message-queue = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+pallet-multisig = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+pallet-mmr = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+pallet-nfts = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+pallet-nomination-pools = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+pallet-nomination-pools-runtime-api = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+#pallet-nft-fractionalization = {  default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407"}
 
-pallet-nis = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-pallet-node-authorization = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-pallet-ranked-collective = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-pallet-recovery = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-pallet-referenda = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-pallet-remark = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-pallet-root-testing = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-pallet-offences = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-pallet-preimage = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-pallet-proxy = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
+pallet-nis = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+pallet-node-authorization = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+pallet-ranked-collective = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+pallet-recovery = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+pallet-referenda = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+pallet-remark = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+pallet-root-testing = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+pallet-offences = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+pallet-preimage = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+pallet-proxy = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
 pallet-session = { default-features = false, features = [
     "historical",
-], git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
+], git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
 pallet-skip-feeless-payment = { default-features = false, features = [
     "historical",
-], git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-pallet-salary = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-pallet-society = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-pallet-staking-reward-curve = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-pallet-staking = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-pallet-state-trie-migration = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-pallet-scheduler = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-pallet-sudo = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-pallet-tips = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-pallet-timestamp = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-pallet-transaction-payment = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-pallet-transaction-storage = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-pallet-transaction-payment-rpc = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-pallet-transaction-payment-rpc-runtime-api = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-pallet-asset-tx-payment = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-pallet-treasury = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-pallet-utility = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-pallet-uniques = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-pallet-whitelist = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-pallet-vesting = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-polkadot-sdk = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-pallet-beefy = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-pallet-beefy-mmr = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-pallet-example-mbm = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-pallet-example-tasks = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
+], git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+pallet-salary = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+pallet-society = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+pallet-staking-reward-curve = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+pallet-staking = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+pallet-state-trie-migration = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+pallet-scheduler = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+pallet-sudo = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+pallet-tips = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+pallet-timestamp = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+pallet-transaction-payment = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+pallet-transaction-storage = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+pallet-transaction-payment-rpc = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+pallet-transaction-payment-rpc-runtime-api = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+pallet-asset-tx-payment = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+pallet-treasury = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+pallet-utility = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+pallet-uniques = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+pallet-whitelist = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+pallet-vesting = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+polkadot-sdk = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+pallet-beefy = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+pallet-beefy-mmr = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+pallet-example-mbm = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+pallet-example-tasks = { default-features = false, git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
 # EVM & Ethereum
 # (wasm)
 # To make it compatible with frontier
@@ -336,51 +339,70 @@ ethereum = { version = "0.15.0", default-features = false }
 
 # Frontier
 # (wasm)
-fp-rpc = { git = "https://github.com/AstarNetwork/frontier", branch = "stable2407", default-features = false }
-fp-self-contained = { git = "https://github.com/AstarNetwork/frontier", branch = "stable2407", default-features = false, features = [
+fp-rpc = { git = "https://github.com/moonbeam-foundation/frontier", branch = "moonbeam-polkadot-stable2407", default-features = false }
+fp-self-contained = { git = "https://github.com/moonbeam-foundation/frontier", branch = "moonbeam-polkadot-stable2407", default-features = false, features = [
     "serde",
 ] }
-pallet-ethereum = { git = "https://github.com/AstarNetwork/frontier", branch = "stable2407", default-features = false, features = [
+pallet-ethereum = { git = "https://github.com/moonbeam-foundation/frontier", branch = "moonbeam-polkadot-stable2407", default-features = false, features = [
     "forbid-evm-reentrancy",
 ] }
-pallet-evm = { git = "https://github.com/AstarNetwork/frontier", branch = "stable2407", default-features = false, features = [
+pallet-evm = { git = "https://github.com/moonbeam-foundation/frontier", branch = "moonbeam-polkadot-stable2407", default-features = false, features = [
     "forbid-evm-reentrancy",
 ] }
-pallet-evm-precompile-blake2 = { git = "https://github.com/AstarNetwork/frontier", branch = "stable2407", default-features = false }
-pallet-evm-precompile-bn128 = { git = "https://github.com/AstarNetwork/frontier", branch = "stable2407", default-features = false }
-pallet-evm-precompile-dispatch = { git = "https://github.com/AstarNetwork/frontier", branch = "stable2407", default-features = false }
-pallet-evm-precompile-ed25519 = { git = "https://github.com/AstarNetwork/frontier", branch = "stable2407", default-features = false }
-pallet-evm-precompile-modexp = { git = "https://github.com/AstarNetwork/frontier", branch = "stable2407", default-features = false }
-pallet-evm-precompile-sha3fips = { git = "https://github.com/AstarNetwork/frontier", branch = "stable2407", default-features = false }
-pallet-evm-precompile-simple = { git = "https://github.com/AstarNetwork/frontier", branch = "stable2407", default-features = false }
-pallet-base-fee = { git = "https://github.com/AstarNetwork/frontier", branch = "stable2407", default-features = false }
-pallet-evm-chain-id = { git = "https://github.com/AstarNetwork/frontier", branch = "stable2407", default-features = false }
-fp-evm = { git = "https://github.com/AstarNetwork/frontier", branch = "stable2407", default-features = false }
-fp-ethereum = { git = "https://github.com/AstarNetwork/frontier", branch = "stable2407", default-features = false }
-precompile-utils = { git = "https://github.com/AstarNetwork/frontier", branch = "stable2407", default-features = false }
+pallet-evm-precompile-blake2 = { git = "https://github.com/moonbeam-foundation/frontier", branch = "moonbeam-polkadot-stable2407", default-features = false }
+pallet-evm-precompile-bn128 = { git = "https://github.com/moonbeam-foundation/frontier", branch = "moonbeam-polkadot-stable2407", default-features = false }
+pallet-evm-precompile-dispatch = { git = "https://github.com/moonbeam-foundation/frontier", branch = "moonbeam-polkadot-stable2407", default-features = false }
+pallet-evm-precompile-ed25519 = { git = "https://github.com/moonbeam-foundation/frontier", branch = "moonbeam-polkadot-stable2407", default-features = false }
+pallet-evm-precompile-modexp = { git = "https://github.com/moonbeam-foundation/frontier", branch = "moonbeam-polkadot-stable2407", default-features = false }
+pallet-evm-precompile-sha3fips = { git = "https://github.com/moonbeam-foundation/frontier", branch = "moonbeam-polkadot-stable2407", default-features = false }
+pallet-evm-precompile-simple = { git = "https://github.com/moonbeam-foundation/frontier", branch = "moonbeam-polkadot-stable2407", default-features = false }
+pallet-base-fee = { git = "https://github.com/moonbeam-foundation/frontier", branch = "moonbeam-polkadot-stable2407", default-features = false }
+pallet-evm-chain-id = { git = "https://github.com/moonbeam-foundation/frontier", branch = "moonbeam-polkadot-stable2407", default-features = false }
+fp-evm = { git = "https://github.com/moonbeam-foundation/frontier", branch = "moonbeam-polkadot-stable2407", default-features = false }
+fp-ethereum = { git = "https://github.com/moonbeam-foundation/frontier", branch = "moonbeam-polkadot-stable2407", default-features = false }
+precompile-utils = { git = "https://github.com/moonbeam-foundation/frontier", branch = "moonbeam-polkadot-stable2407", default-features = false }
 
 
 # (native)
-fc-consensus = { git = "https://github.com/AstarNetwork/frontier", branch = "stable2407" }
-fc-db = { git = "https://github.com/AstarNetwork/frontier", branch = "stable2407" }
-fc-api = { git = "https://github.com/AstarNetwork/frontier", branch = "stable2407" }
-fc-mapping-sync = { git = "https://github.com/AstarNetwork/frontier", branch = "stable2407" }
-fc-rpc = { git = "https://github.com/AstarNetwork/frontier", branch = "stable2407", features = [
+fc-consensus = { git = "https://github.com/moonbeam-foundation/frontier", branch = "moonbeam-polkadot-stable2407" }
+fc-db = { git = "https://github.com/moonbeam-foundation/frontier", branch = "moonbeam-polkadot-stable2407" }
+fc-api = { git = "https://github.com/moonbeam-foundation/frontier", branch = "moonbeam-polkadot-stable2407" }
+fc-mapping-sync = { git = "https://github.com/moonbeam-foundation/frontier", branch = "moonbeam-polkadot-stable2407" }
+fc-rpc = { git = "https://github.com/moonbeam-foundation/frontier", branch = "moonbeam-polkadot-stable2407", features = [
     "rpc-binary-search-estimate",
     "txpool",
 ] }
-fc-rpc-core = { git = "https://github.com/AstarNetwork/frontier", branch = "stable2407" }
-fp-consensus = { git = "https://github.com/AstarNetwork/frontier", branch = "stable2407" }
-fp-storage = { git = "https://github.com/AstarNetwork/frontier", branch = "stable2407" }
-fc-storage = { git = "https://github.com/AstarNetwork/frontier", branch = "stable2407" }
+fc-rpc-core = { git = "https://github.com/moonbeam-foundation/frontier", branch = "moonbeam-polkadot-stable2407" }
+fp-consensus = { git = "https://github.com/moonbeam-foundation/frontier", branch = "moonbeam-polkadot-stable2407" }
+fp-storage = { git = "https://github.com/moonbeam-foundation/frontier", branch = "moonbeam-polkadot-stable2407" }
+fc-storage = { git = "https://github.com/moonbeam-foundation/frontier", branch = "moonbeam-polkadot-stable2407" }
 
-
-# Local Runtime
-node-template-runtime = { path = "./runtime/development" }
-runtime-common = { path = "./runtime/common", default-features = false }
-# Default
 node-inspect = { path = "./bin/substrate-node/inspect", package = "staging-node-inspect" }
 node-primitives = { path = "./primitives", default-features = false }
+
+# Substrate node pallets & modules
+# (wasm)
+# pallet-ethereum-checked = { path = "./pallets/ethereum-checked", default-features = false }
+pallet-unified-accounts = { path = "./pallets/unified-accounts", default-features = false }
+
+
+pallet-evm-precompile-assets-erc20 = { path = "./precompiles/assets-erc20", default-features = false }
+pallet-evm-precompile-sr25519 = { path = "./precompiles/sr25519", default-features = false }
+pallet-evm-precompile-substrate-ecdsa = { path = "./precompiles/substrate-ecdsa", default-features = false }
+# pallet-evm-precompile-xcm = { path = "./precompiles/xcm", default-features = false }
+# pallet-evm-precompile-dapp-staking = { path = "./precompiles/dapp-staking", default-features = false }
+pallet-evm-precompile-unified-accounts = { path = "./precompiles/unified-accounts", default-features = false }
+pallet-evm-precompile-dispatch-lockdrop = { path = "./precompiles/dispatch-lockdrop", default-features = false }
+
+# pallet-chain-extension-assets = { path = "./chain-extensions/pallet-assets", default-features = false }
+# pallet-chain-extension-unified-accounts = { path = "./chain-extensions/unified-accounts", default-features = false }
+
+# assets-chain-extension-types = { path = "./chain-extensions/types/assets", default-features = false }
+# unified-accounts-chain-extension-types = { path = "./chain-extensions/types/unified-accounts", default-features = false }
+
+
+node-template-runtime = { path = "./runtime/development" }
+runtime-common = { path = "./runtime/common", default-features = false }
 
 
 ## Moonbeam tracing
@@ -403,8 +425,8 @@ moonbeam-rpc-core-debug = { path = "./vendor/rpc-core/debug" }
 
 
 # Build deps
-substrate-wasm-builder = { git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
-substrate-build-script-utils = { git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
+substrate-wasm-builder = { git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
+substrate-build-script-utils = { git = "https://github.com/moonbeam-foundation/polkadot-sdk", branch = "moonbeam-polkadot-stable2407" }
 
 [profile.release]
 panic = "unwind"

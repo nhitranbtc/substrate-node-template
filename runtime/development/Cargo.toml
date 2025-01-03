@@ -25,6 +25,7 @@ codec = { features = ["derive", "max-encoded-len"], workspace = true }
 scale-info = { features = ["derive", "serde"], workspace = true }
 static_assertions = { workspace = true, default-features = true }
 log = { workspace = true }
+num_enum = { workspace = true }
 serde_json = { features = ["alloc", "arbitrary_precision"], workspace = true }
 
 # pallet-asset-conversion: turn on "num-traits" feature
@@ -35,8 +36,35 @@ primitive-types = { features = [
 ], workspace = true }
 polkadot-sdk = { features = ["runtime", "tuples-96"], workspace = true }
 
-# Local Dependencies
+sp-std = { workspace = true }
+sp-core = { workspace = true }
+
+fp-evm = { workspace = true }
+fp-rpc = { workspace = true }
+fp-self-contained = { workspace = true }
+
+pallet-ethereum = { workspace = true }
+# pallet-ethereum-checked = { workspace = true }
+pallet-evm = { workspace = true }
+pallet-evm-precompile-blake2 = { workspace = true }
+pallet-evm-precompile-bn128 = { workspace = true }
+pallet-evm-precompile-dispatch = { workspace = true }
+pallet-evm-precompile-ed25519 = { workspace = true }
+pallet-evm-precompile-modexp = { workspace = true }
+pallet-evm-precompile-sha3fips = { workspace = true }
+pallet-evm-precompile-simple = { workspace = true }
+
+
+# Node pallets
 node-primitives = { workspace = true }
+pallet-evm-precompile-assets-erc20 = { workspace = true }
+#pallet-evm-precompile-dapp-staking = { workspace = true }
+pallet-evm-precompile-dispatch-lockdrop = { workspace = true }
+pallet-evm-precompile-sr25519 = { workspace = true }
+pallet-evm-precompile-substrate-ecdsa = { workspace = true }
+pallet-evm-precompile-unified-accounts = { workspace = true }
+pallet-unified-accounts = { workspace = true }
+precompile-utils = { workspace = true }
 
 
 [build-dependencies]
@@ -44,16 +72,39 @@ substrate-wasm-builder = { optional = true, workspace = true, default-features =
 
 [features]
 default = ["std"]
-with-tracing = ["polkadot-sdk/with-tracing"]
 std = [
 	"codec/std",
 	"log/std",
+	"num_enum/std",
 	"node-primitives/std",
 	"polkadot-sdk/std",
 	"scale-info/std",
 	"serde_json/std",
+	"fp-rpc/std",
+	"fp-evm/std",
+	"fp-self-contained/std",
 	"substrate-wasm-builder",
+	"pallet-evm-precompile-unified-accounts/std",
+	"pallet-unified-accounts/std",
+	"pallet-evm-precompile-assets-erc20/std",
+
+	"pallet-evm-precompile-blake2/std",
+	"pallet-evm-precompile-simple/std",
+	"pallet-evm-precompile-bn128/std",
+	"pallet-evm-precompile-dispatch/std",
+	"pallet-evm-precompile-ed25519/std",
+	"pallet-evm-precompile-modexp/std",
+	"pallet-evm-precompile-sha3fips/std",
+	#"pallet-evm-precompile-dapp-staking/std",
+	"pallet-evm-precompile-substrate-ecdsa/std",
+	"pallet-evm-precompile-unified-accounts/std",
+	"pallet-evm-precompile-dispatch-lockdrop/std",
+	"sp-std/std",
+	"sp-core/std",
+
+
 ]
+with-tracing = ["polkadot-sdk/with-tracing"]
 runtime-benchmarks = ["polkadot-sdk/runtime-benchmarks"]
 try-runtime = ["polkadot-sdk/try-runtime"]
 

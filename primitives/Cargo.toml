@@ -22,6 +22,11 @@ log = { workspace = true }
 codec = { workspace = true }
 scale-info = { workspace = true }
 
+# Ethereum/Frontier dependencies
+ethereum = { workspace = true, features = ["with-codec"] }
+ethereum-types = { workspace = true }
+fp-evm = { workspace = true }
+
 # Substrate dependencies
 frame-support = { workspace = true }
 frame-system = { workspace = true }
@@ -35,6 +40,16 @@ sp-io = { workspace = true }
 sp-runtime = { workspace = true }
 sp-std = { workspace = true }
 
+pallet-contracts = { workspace = true }
+
+# Frontier dependencies
+pallet-evm = { workspace = true }
+
+# Substrate (Self) pallets & dependencies
+pallet-evm-precompile-assets-erc20 = { workspace = true }
+pallet-evm-precompile-dispatch = { workspace = true }
+# pallet-xc-asset-config = { workspace = true }
+
 
 [features]
 default = ["std"]
@@ -42,8 +57,25 @@ std = [
     "log/std",
     "codec/std",
     "scale-info/std",
-    "sp-core/std",
+    "ethereum-types/std",
+    "ethereum/std",
+    "fp-evm/std",
+    "frame-support/std",
+    "pallet-treasury/std",
+    "frame-system/std",
+    "pallet-membership/std",
+    "pallet-collective/std",
+    "sp-std/std",
     "sp-runtime/std",
+    "sp-core/std",
+    "sp-io/std",
+    "pallet-assets/std",
+    "pallet-evm/std",
+    "pallet-contracts/std",
+    "pallet-evm-precompile-assets-erc20/std",
+    "pallet-evm-precompile-dispatch/std",
+    "sp-arithmetic/std",
+
 ]
 
 runtime-benchmarks = []

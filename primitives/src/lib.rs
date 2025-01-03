@@ -29,6 +29,15 @@ use sp_runtime::{
 	MultiSignature, OpaqueExtrinsic,
 };
 
+/// Checked Ethereum transaction primitives
+// pub mod ethereum_checked;
+
+/// EVM primitives.
+pub mod evm;
+
+/// Precompiles
+pub mod precompiles;
+
 /// An index to a block.
 pub type BlockNumber = u32;
 
@@ -53,6 +62,15 @@ pub type Nonce = u32;
 
 /// A hash of some data used by the chain.
 pub type Hash = sp_core::H256;
+
+/// Id used for identifying assets.
+///
+/// AssetId allocation:
+/// [1; 2^32-1]     Custom user assets (permissionless)
+/// [2^32; 2^64-1]  Statemine assets (simple map)
+/// [2^64; 2^128-1] Ecosystem assets
+/// 2^128-1         Relay chain token (KSM)
+pub type AssetId = u128;
 
 /// A timestamp: milliseconds since the unix epoch.
 /// `u64` is enough to represent a duration of half a billion years, when the
