@@ -18,30 +18,37 @@
 
 //! Substrate chain configurations.
 
-use polkadot_sdk::*;
+use polkadot_sdk::{ *, sp_keyring::{ Ed25519Keyring, Sr25519Keyring } };
+use hex_literal::hex;
 
-use node_template_runtime::{
-	constants::currency::*, wasm_binary_unwrap, Block, MaxNominations, SessionKeys, StakerStatus,
+use sp_std::collections::btree_map::BTreeMap;
+use evm_node_runtime::{
+	EVMConfig,
+	constants::currency::*,
+	wasm_binary_unwrap,
+	Block,
+	MaxNominations,
+	SessionKeys,
+	StakerStatus,
 };
-
+use std::str::FromStr;
+use sp_core::{ H160, H256, U256 };
+use sp_consensus_aura::{ sr25519::AuthorityId as AuraId, AuraApi };
 use pallet_im_online::sr25519::AuthorityId as ImOnlineId;
 use sc_chain_spec::ChainSpecExtension;
 use sc_service::ChainType;
 use sc_telemetry::TelemetryEndpoints;
-use serde::{Deserialize, Serialize};
+use serde::{ Deserialize, Serialize };
 use sp_authority_discovery::AuthorityId as AuthorityDiscoveryId;
 use sp_consensus_babe::AuthorityId as BabeId;
 use sp_consensus_beefy::ecdsa_crypto::AuthorityId as BeefyId;
 use sp_consensus_grandpa::AuthorityId as GrandpaId;
-use sp_core::{crypto::UncheckedInto, sr25519, Pair, Public};
+use sp_core::{ crypto::UncheckedInto, sr25519, Pair, Public };
 use sp_mixnet::types::AuthorityId as MixnetId;
-use sp_runtime::{
-	traits::{IdentifyAccount, Verify},
-	Perbill,
-};
+use sp_runtime::{ traits::{ IdentifyAccount, Verify }, Perbill };
 
-pub use node_primitives::{AccountId, Balance, Signature};
-pub use node_template_runtime::RuntimeGenesisConfig;
+pub use node_primitives::{ AccountId, Balance, Signature, EVM_REVERT_CODE };
+pub use evm_node_runtime::RuntimeGenesisConfig;
 
 type AccountPublic = <Signature as Verify>::Signer;
 
@@ -71,28 +78,12 @@ pub fn flaming_fir_config() -> Result<ChainSpec, String> {
 	ChainSpec::from_json_bytes(&include_bytes!("../../res/flaming-fir.json")[..])
 }
 
-fn session_keys(
-	grandpa: GrandpaId,
-	babe: BabeId,
-	im_online: ImOnlineId,
-	authority_discovery: AuthorityDiscoveryId,
-	mixnet: MixnetId,
-	beefy: BeefyId,
-) -> SessionKeys {
-	SessionKeys { grandpa, babe, im_online, authority_discovery, mixnet, beefy }
+fn session_keys(grandpa: GrandpaId, aura: AuraId) -> SessionKeys {
+	SessionKeys { grandpa, aura }
 }
 
 fn configure_accounts_for_staging_testnet() -> (
-	Vec<(
-		AccountId,
-		AccountId,
-		GrandpaId,
-		BabeId,
-		ImOnlineId,
-		AuthorityDiscoveryId,
-		MixnetId,
-		BeefyId,
-	)>,
+	Vec<(AccountId, AccountId, GrandpaId, AuraId)>,
 	AccountId,
 	Vec<AccountId>,
 ) {
@@ -108,16 +99,12 @@ fn configure_accounts_for_staging_testnet() -> (
 	// and
 	//
 	// for i in 1 2 3 4 ; do for j in session; do subkey inspect --scheme ecdsa "$secret"//fir//$j//$i; done; done
-
 	let initial_authorities: Vec<(
 		AccountId,
 		AccountId,
 		GrandpaId,
-		BabeId,
-		ImOnlineId,
-		AuthorityDiscoveryId,
-		MixnetId,
-		BeefyId,
+		AuraId,
+
 	)> = vec![
 		(
 			// 5Fbsd6WXDGiLTxunqeK5BATNiocfCqu9bS1yArVjCgeBLkVy
@@ -130,18 +117,7 @@ fn configure_accounts_for_staging_testnet() -> (
 			// 5EZaeQ8djPcq9pheJUhgerXQZt9YaHnMJpiHMRhwQeinqUW8
 			array_bytes::hex2array_unchecked("6e7e4eb42cbd2e0ab4cae8708ce5509580b8c04d11f6758dbf686d50fe9f9106")
 				.unchecked_into(),
-			// 5EZaeQ8djPcq9pheJUhgerXQZt9YaHnMJpiHMRhwQeinqUW8
-			array_bytes::hex2array_unchecked("6e7e4eb42cbd2e0ab4cae8708ce5509580b8c04d11f6758dbf686d50fe9f9106")
-				.unchecked_into(),
-			// 5EZaeQ8djPcq9pheJUhgerXQZt9YaHnMJpiHMRhwQeinqUW8
-			array_bytes::hex2array_unchecked("6e7e4eb42cbd2e0ab4cae8708ce5509580b8c04d11f6758dbf686d50fe9f9106")
-				.unchecked_into(),
-			// 5EZaeQ8djPcq9pheJUhgerXQZt9YaHnMJpiHMRhwQeinqUW8
-			array_bytes::hex2array_unchecked("6e7e4eb42cbd2e0ab4cae8708ce5509580b8c04d11f6758dbf686d50fe9f9106")
-				.unchecked_into(),
-			// 5DMLFcDdLLQbw696YfHaWBpQR99HwR456ycSCfr6L7KXGYK8
-			array_bytes::hex2array_unchecked("035560fafa241739869360aa4b32bc98953172ceb41a19c6cc1a27962fb3d1ecec")
-				.unchecked_into(),
+
 		),
 		(
 			// 5ERawXCzCWkjVq3xz1W5KGNtVx2VdefvZ62Bw1FEuZW4Vny2
@@ -153,18 +129,6 @@ fn configure_accounts_for_staging_testnet() -> (
 				.unchecked_into(),
 			// 5DhLtiaQd1L1LU9jaNeeu9HJkP6eyg3BwXA7iNMzKm7qqruQ
 			array_bytes::hex2array_unchecked("482dbd7297a39fa145c570552249c2ca9dd47e281f0c500c971b59c9dcdcd82e")
-				.unchecked_into(),
-			// 5DhLtiaQd1L1LU9jaNeeu9HJkP6eyg3BwXA7iNMzKm7qqruQ
-			array_bytes::hex2array_unchecked("482dbd7297a39fa145c570552249c2ca9dd47e281f0c500c971b59c9dcdcd82e")
-				.unchecked_into(),
-			// 5DhLtiaQd1L1LU9jaNeeu9HJkP6eyg3BwXA7iNMzKm7qqruQ
-			array_bytes::hex2array_unchecked("482dbd7297a39fa145c570552249c2ca9dd47e281f0c500c971b59c9dcdcd82e")
-				.unchecked_into(),
-			// 5DhLtiaQd1L1LU9jaNeeu9HJkP6eyg3BwXA7iNMzKm7qqruQ
-			array_bytes::hex2array_unchecked("482dbd7297a39fa145c570552249c2ca9dd47e281f0c500c971b59c9dcdcd82e")
-				.unchecked_into(),
-			// 5FYk11kNtB4178wLKJ2RNoUzzcjgRUciFe3SJDVZXhqX4dzG
-			array_bytes::hex2array_unchecked("02da1ab255ed888ee3e19b73d335fc13160b3eb10456c2d17c6a8ea7de403d2445")
 				.unchecked_into(),
 		),
 		(
@@ -178,18 +142,7 @@ fn configure_accounts_for_staging_testnet() -> (
 			// 5DhKqkHRkndJu8vq7pi2Q5S3DfftWJHGxbEUNH43b46qNspH
 			array_bytes::hex2array_unchecked("482a3389a6cf42d8ed83888cfd920fec738ea30f97e44699ada7323f08c3380a")
 				.unchecked_into(),
-			// 5DhKqkHRkndJu8vq7pi2Q5S3DfftWJHGxbEUNH43b46qNspH
-			array_bytes::hex2array_unchecked("482a3389a6cf42d8ed83888cfd920fec738ea30f97e44699ada7323f08c3380a")
-				.unchecked_into(),
-			// 5DhKqkHRkndJu8vq7pi2Q5S3DfftWJHGxbEUNH43b46qNspH
-			array_bytes::hex2array_unchecked("482a3389a6cf42d8ed83888cfd920fec738ea30f97e44699ada7323f08c3380a")
-				.unchecked_into(),
-			// 5DhKqkHRkndJu8vq7pi2Q5S3DfftWJHGxbEUNH43b46qNspH
-			array_bytes::hex2array_unchecked("482a3389a6cf42d8ed83888cfd920fec738ea30f97e44699ada7323f08c3380a")
-				.unchecked_into(),
-			// 5GQx4FToRBPqfani6o7owFJE1UstiviqbPP7HPWyvtXWWukn
-			array_bytes::hex2array_unchecked("036a818b3f59579c5fbbe4fede64f49dbf090ba883eb2a175d5ca90e5adb5f0b3e")
-				.unchecked_into(),
+
 		),
 		(
 			// 5HYZnKWe5FVZQ33ZRJK1rG3WaLMztxWrrNDb1JRwaHHVWyP9
@@ -202,25 +155,14 @@ fn configure_accounts_for_staging_testnet() -> (
 			// 5C4vDQxA8LTck2xJEy4Yg1hM9qjDt4LvTQaMo4Y8ne43aU6x
 			array_bytes::hex2array_unchecked("00299981a2b92f878baaf5dbeba5c18d4e70f2a1fcd9c61b32ea18daf38f4378")
 				.unchecked_into(),
-			// 5C4vDQxA8LTck2xJEy4Yg1hM9qjDt4LvTQaMo4Y8ne43aU6x
-			array_bytes::hex2array_unchecked("00299981a2b92f878baaf5dbeba5c18d4e70f2a1fcd9c61b32ea18daf38f4378")
-				.unchecked_into(),
-			// 5C4vDQxA8LTck2xJEy4Yg1hM9qjDt4LvTQaMo4Y8ne43aU6x
-			array_bytes::hex2array_unchecked("00299981a2b92f878baaf5dbeba5c18d4e70f2a1fcd9c61b32ea18daf38f4378")
-				.unchecked_into(),
-			// 5C4vDQxA8LTck2xJEy4Yg1hM9qjDt4LvTQaMo4Y8ne43aU6x
-			array_bytes::hex2array_unchecked("00299981a2b92f878baaf5dbeba5c18d4e70f2a1fcd9c61b32ea18daf38f4378")
-				.unchecked_into(),
-			// 5FCu2pY928VVHPgnNVJssvxFJZECyNe1CyH3WTG79Wisx58B
-			array_bytes::hex2array_unchecked("020ce02b963548f9f8ade8765f7a4a06638c17819c78422a1cc35b647873583eef")
-				.unchecked_into(),
+
 		),
 	];
 
 	// generated with secret: subkey inspect "$secret"/fir
 	let root_key: AccountId = array_bytes::hex_n_into_unchecked(
 		// 5Ff3iXP75ruzroPWRP2FYBHWnmGGBSb63857BgnzCoXNxfPo
-		"9ee5e5bdc0ec239eb164f865ecc345ce4c88e76ee002e0f7e318097347471809",
+		"9ee5e5bdc0ec239eb164f865ecc345ce4c88e76ee002e0f7e318097347471809"
 	);
 
 	let endowed_accounts: Vec<AccountId> = vec![root_key.clone()];
@@ -241,8 +183,9 @@ pub fn staging_testnet_config() -> ChainSpec {
 		.with_chain_type(ChainType::Live)
 		.with_genesis_config_patch(staging_testnet_config_genesis())
 		.with_telemetry_endpoints(
-			TelemetryEndpoints::new(vec![(STAGING_TELEMETRY_URL.to_string(), 0)])
-				.expect("Staging telemetry url is valid; qed"),
+			TelemetryEndpoints::new(vec![(STAGING_TELEMETRY_URL.to_string(), 0)]).expect(
+				"Staging telemetry url is valid; qed"
+			)
 		)
 		.build()
 }
@@ -256,54 +199,28 @@ pub fn get_from_seed<TPublic: Public>(seed: &str) -> <TPublic::Pair as Pair>::Pu
 
 /// Helper function to generate an account ID from seed.
 pub fn get_account_id_from_seed<TPublic: Public>(seed: &str) -> AccountId
-where
-	AccountPublic: From<<TPublic::Pair as Pair>::Public>,
+	where AccountPublic: From<<TPublic::Pair as Pair>::Public>
 {
 	AccountPublic::from(get_from_seed::<TPublic>(seed)).into_account()
 }
 
 /// Helper function to generate stash, controller and session key from seed.
-pub fn authority_keys_from_seed(
-	seed: &str,
-) -> (AccountId, AccountId, GrandpaId, BabeId, ImOnlineId, AuthorityDiscoveryId, MixnetId, BeefyId)
-{
+pub fn authority_keys_from_seed(seed: &str) -> (AccountId, AccountId, GrandpaId, AuraId) {
 	(
 		get_account_id_from_seed::<sr25519::Public>(&format!("{}//stash", seed)),
 		get_account_id_from_seed::<sr25519::Public>(seed),
 		get_from_seed::<GrandpaId>(seed),
-		get_from_seed::<BabeId>(seed),
-		get_from_seed::<ImOnlineId>(seed),
-		get_from_seed::<AuthorityDiscoveryId>(seed),
-		get_from_seed::<MixnetId>(seed),
-		get_from_seed::<BeefyId>(seed),
+		get_from_seed::<AuraId>(seed),
 	)
 }
 
 fn configure_accounts(
-	initial_authorities: Vec<(
-		AccountId,
-		AccountId,
-		GrandpaId,
-		BabeId,
-		ImOnlineId,
-		AuthorityDiscoveryId,
-		MixnetId,
-		BeefyId,
-	)>,
+	initial_authorities: Vec<(AccountId, AccountId, GrandpaId, AuraId)>,
 	initial_nominators: Vec<AccountId>,
 	endowed_accounts: Option<Vec<AccountId>>,
-	stash: Balance,
+	stash: Balance
 ) -> (
-	Vec<(
-		AccountId,
-		AccountId,
-		GrandpaId,
-		BabeId,
-		ImOnlineId,
-		AuthorityDiscoveryId,
-		MixnetId,
-		BeefyId,
-	)>,
+	Vec<(AccountId, AccountId, GrandpaId, AuraId)>,
 	Vec<AccountId>,
 	usize,
 	Vec<(AccountId, AccountId, Balance, StakerStatus<AccountId>)>,
@@ -321,7 +238,7 @@ fn configure_accounts(
 			get_account_id_from_seed::<sr25519::Public>("Charlie//stash"),
 			get_account_id_from_seed::<sr25519::Public>("Dave//stash"),
 			get_account_id_from_seed::<sr25519::Public>("Eve//stash"),
-			get_account_id_from_seed::<sr25519::Public>("Ferdie//stash"),
+			get_account_id_from_seed::<sr25519::Public>("Ferdie//stash")
 		]
 	});
 	// endow all authorities and nominators.
@@ -340,18 +257,20 @@ fn configure_accounts(
 	let stakers = initial_authorities
 		.iter()
 		.map(|x| (x.0.clone(), x.0.clone(), stash, StakerStatus::Validator))
-		.chain(initial_nominators.iter().map(|x| {
-			use rand::{seq::SliceRandom, Rng};
-			let limit = (MaxNominations::get() as usize).min(initial_authorities.len());
-			let count = rng.gen::<usize>() % limit;
-			let nominations = initial_authorities
-				.as_slice()
-				.choose_multiple(&mut rng, count)
-				.into_iter()
-				.map(|choice| choice.0.clone())
-				.collect::<Vec<_>>();
-			(x.clone(), x.clone(), stash, StakerStatus::Nominator(nominations))
-		}))
+		.chain(
+			initial_nominators.iter().map(|x| {
+				use rand::{ seq::SliceRandom, Rng };
+				let limit = (MaxNominations::get() as usize).min(initial_authorities.len());
+				let count = rng.gen::<usize>() % limit;
+				let nominations = initial_authorities
+					.as_slice()
+					.choose_multiple(&mut rng, count)
+					.into_iter()
+					.map(|choice| choice.0.clone())
+					.collect::<Vec<_>>();
+				(x.clone(), x.clone(), stash, StakerStatus::Nominator(nominations))
+			})
+		)
 		.collect::<Vec<_>>();
 
 	let num_endowed_accounts = endowed_accounts.len();
@@ -361,24 +280,125 @@ fn configure_accounts(
 
 /// Helper function to create RuntimeGenesisConfig json patch for testing.
 pub fn testnet_genesis(
-	initial_authorities: Vec<(
-		AccountId,
-		AccountId,
-		GrandpaId,
-		BabeId,
-		ImOnlineId,
-		AuthorityDiscoveryId,
-		MixnetId,
-		BeefyId,
-	)>,
+	initial_authorities: Vec<(AccountId, AccountId, GrandpaId, AuraId)>,
 	initial_nominators: Vec<AccountId>,
 	root_key: AccountId,
-	endowed_accounts: Option<Vec<AccountId>>,
+	endowed_accounts: Option<Vec<AccountId>>
 ) -> serde_json::Value {
-	let (initial_authorities, endowed_accounts, num_endowed_accounts, stakers) =
-		configure_accounts(initial_authorities, initial_nominators, endowed_accounts, STASH);
+	let (initial_authorities, endowed_accounts, num_endowed_accounts, stakers) = configure_accounts(
+		initial_authorities,
+		initial_nominators,
+		endowed_accounts,
+		STASH
+	);
+
+	let evm_accounts = {
+		let mut map = BTreeMap::new();
+		map.insert(
+			// H160 address of Alice dev account
+			// Derived from SS58 (42 prefix) address
+			// SS58: 5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY
+			// hex: 0xd43593c715fdd31c61141abd04a99fd6822c8558854ccde39a5684e7a56da27d
+			// Using the full hex key, truncating to the first 20 bytes (the first 40 hex chars)
+			H160::from_str("d43593c715fdd31c61141abd04a99fd6822c8558").expect(
+				"internal H160 is valid; qed"
+			),
+			fp_evm::GenesisAccount {
+				balance: U256::from_str("0xffffffffffffffffffffffffffffffff").expect(
+					"internal U256 is valid; qed"
+				),
+				code: Default::default(),
+				nonce: Default::default(),
+				storage: Default::default(),
+			}
+		);
+		map.insert(
+			// H160 address of CI test runner account
+			H160::from_str("6be02d1d3665660d22ff9624b7be0551ee1ac91b").expect(
+				"internal H160 is valid; qed"
+			),
+			fp_evm::GenesisAccount {
+				balance: U256::from_str("0xffffffffffffffffffffffffffffffff").expect(
+					"internal U256 is valid; qed"
+				),
+				code: Default::default(),
+				nonce: Default::default(),
+				storage: Default::default(),
+			}
+		);
+		map.insert(
+			// H160 address for benchmark usage
+			H160::from_str("1000000000000000000000000000000000000001").expect(
+				"internal H160 is valid; qed"
+			),
+			fp_evm::GenesisAccount {
+				nonce: U256::from(1),
+				balance: U256::from(1_000_000_000_000_000_000_000_000u128),
+				storage: Default::default(),
+				code: vec![0x00],
+			}
+		);
+
+		// 	 Secret phrase:       canvas custom quote spring pull chair hood analyst front abandon when reward
+		//   Network ID:        substrate
+		//   Secret seed:       0xf3b8e69784a43ebffae1288d8f75bb2b03cdea627fe4321867f8984fe39406b4
+		//   Public key (hex):  0x0086acd5895bf544e17e52336b97b71a7d004b452bd93f7c6353093963fd9c2c
+		//   Account ID:        0x0086acd5895bf544e17e52336b97b71a7d004b452bd93f7c6353093963fd9c2c
+		//   Public key (SS58): 5C5Ps4raJyqJ9CGAkWor6ffBQyWiGLnhbu236WGaNiqrET3D
+		//   SS58 Address:      5C5Ps4raJyqJ9CGAkWor6ffBQyWiGLnhbu236WGaNiqrET3D
+
+		map.insert(
+			H160::from_slice(&hex_literal::hex!("0086acd5895bf544e17e52336b97b71a7d004b45")),
+			fp_evm::GenesisAccount {
+				nonce: Default::default(),
+				// Using a larger number, so I can tell the accounts apart by balance.
+				balance: U256::from_str("0xffffffffffffffffffffffffffffffff").expect(
+					"internal U256 is valid; qed"
+				),
+				code: EVM_REVERT_CODE.into(),
+				storage: Default::default(),
+			}
+		);
+
+		// Metamask Account
+		// evm: 0x90C0e840C8591b9074A3022f71C7Fb0171bF3bc3
+		// private: cf630eb31dd837a71660ab5f8b3e3cf67ea8b64d80b83da53a79ccd02a11ef09
+		// SS50: XnUf82gGZSGCsdZsc1xsFoebftynqdx2ZRQm3n48d9pEfaR
+
+		map.insert(
+			H160::from_slice(&hex_literal::hex!("90C0e840C8591b9074A3022f71C7Fb0171bF3bc3")),
+			fp_evm::GenesisAccount {
+				nonce: Default::default(),
+				// Using a larger number, so I can tell the accounts apart by balance.
+				balance: U256::from_str("0xffffffffffffffffffffffffffffffff").expect(
+					"internal U256 is valid; qed"
+				),
+				code: EVM_REVERT_CODE.into(),
+				storage: Default::default(),
+			}
+		);
+
+		//Alith:
+		//Public Address: 0xf24FF3a9CF04c71Dbc94D0b566f7A27B94566cac
+		//Private Key: 0x5fb92d6e98884f76de468fa3f6278f8807c48bebc13595d45af5bdc4da702133
+		map.insert(
+			H160::from_slice(&hex_literal::hex!("f24FF3a9CF04c71Dbc94D0b566f7A27B94566cac")),
+			fp_evm::GenesisAccount {
+				nonce: Default::default(),
+				// Using a larger number, so I can tell the accounts apart by balance.
+				balance: U256::from_str("0xffffffffffffffffffffffffffffffff").expect(
+					"internal U256 is valid; qed"
+				),
+				code: Default::default(),
+				storage: Default::default(),
+			}
+		);
+		map
+	};
 
 	serde_json::json!({
+		"evmChainId" : { "chainId": 4369 },
+		"evm": { "accounts": evm_accounts },
 		"balances": {
 			"balances": endowed_accounts.iter().cloned().map(|x| (x, ENDOWMENT)).collect::<Vec<_>>(),
 		},
@@ -392,15 +412,12 @@ pub fn testnet_genesis(
 						session_keys(
 							x.2.clone(),
 							x.3.clone(),
-							x.4.clone(),
-							x.5.clone(),
-							x.6.clone(),
-							x.7.clone(),
 						),
 					)
 				})
 				.collect::<Vec<_>>(),
 		},
+
 		"staking": {
 			"validatorCount": initial_authorities.len() as u32,
 			"minimumValidatorCount": initial_authorities.len() as u32,
@@ -408,14 +425,7 @@ pub fn testnet_genesis(
 			"slashRewardFraction": Perbill::from_percent(10),
 			"stakers": stakers.clone(),
 		},
-		"elections": {
-			"members": endowed_accounts
-				.iter()
-				.take((num_endowed_accounts + 1) / 2)
-				.cloned()
-				.map(|member| (member, STASH))
-				.collect::<Vec<_>>(),
-		},
+
 		"technicalCommittee": {
 			"members": endowed_accounts
 				.iter()
@@ -424,12 +434,6 @@ pub fn testnet_genesis(
 				.collect::<Vec<_>>(),
 		},
 		"sudo": { "key": Some(root_key.clone()) },
-		"babe": {
-			"epochConfig": Some(node_template_runtime::BABE_GENESIS_EPOCH_CONFIG),
-		},
-
-
-		"society": { "pot": 0 },
 		"assets": {
 			// This asset is used by the NIS pallet as counterpart currency.
 			"assets": vec![(9, get_account_id_from_seed::<sr25519::Public>("Alice"), true, 1)],
@@ -446,7 +450,7 @@ fn development_config_genesis_json() -> serde_json::Value {
 		vec![authority_keys_from_seed("Alice")],
 		vec![],
 		get_account_id_from_seed::<sr25519::Public>("Alice"),
-		None,
+		None
 	)
 }
 
@@ -454,7 +458,7 @@ fn development_config_genesis_json() -> serde_json::Value {
 pub fn development_config() -> ChainSpec {
 	let mut properties = serde_json::map::Map::new();
 	properties.insert("tokenSymbol".into(), "APPLE".into());
-	properties.insert("tokenDecimals".into(), 18.into());
+	properties.insert("tokenDecimals".into(), (18).into());
 
 	ChainSpec::builder(wasm_binary_unwrap(), Default::default())
 		.with_name("Development")
@@ -470,7 +474,7 @@ fn local_testnet_genesis() -> serde_json::Value {
 		vec![authority_keys_from_seed("Alice"), authority_keys_from_seed("Bob")],
 		vec![],
 		get_account_id_from_seed::<sr25519::Public>("Alice"),
-		None,
+		None
 	)
 }
 
@@ -478,7 +482,7 @@ fn local_testnet_genesis() -> serde_json::Value {
 pub fn local_testnet_config() -> ChainSpec {
 	let mut properties = serde_json::map::Map::new();
 	properties.insert("tokenSymbol".into(), "APPLE".into());
-	properties.insert("tokenDecimals".into(), 18.into());
+	properties.insert("tokenDecimals".into(), (18).into());
 
 	ChainSpec::builder(wasm_binary_unwrap(), Default::default())
 		.with_name("Local Testnet")
@@ -487,70 +491,4 @@ pub fn local_testnet_config() -> ChainSpec {
 		.with_properties(properties)
 		.with_genesis_config_patch(local_testnet_genesis())
 		.build()
-}
-
-#[cfg(test)]
-pub(crate) mod tests {
-	use super::*;
-	use crate::service::{new_full_base, NewFullBase};
-	use sc_service_test;
-	use sp_runtime::BuildStorage;
-
-	/// Local testnet config (single validator - Alice).
-	pub fn integration_test_config_with_single_authority() -> ChainSpec {
-		ChainSpec::builder(wasm_binary_unwrap(), Default::default())
-			.with_name("Integration Test")
-			.with_id("test")
-			.with_chain_type(ChainType::Development)
-			.with_genesis_config_patch(testnet_genesis(
-				vec![authority_keys_from_seed("Alice")],
-				vec![],
-				get_account_id_from_seed::<sr25519::Public>("Alice"),
-				None,
-			))
-			.build()
-	}
-
-	/// Local testnet config (multivalidator Alice + Bob).
-	pub fn integration_test_config_with_two_authorities() -> ChainSpec {
-		ChainSpec::builder(wasm_binary_unwrap(), Default::default())
-			.with_name("Integration Test")
-			.with_id("test")
-			.with_chain_type(ChainType::Development)
-			.with_genesis_config_patch(local_testnet_genesis())
-			.build()
-	}
-
-	#[test]
-	#[ignore]
-	fn test_connectivity() {
-		sp_tracing::try_init_simple();
-
-		sc_service_test::connectivity(integration_test_config_with_two_authorities(), |config| {
-			let NewFullBase { task_manager, client, network, sync, transaction_pool, .. } =
-				new_full_base::<sc_network::NetworkWorker<_, _>>(config, None, false, |_, _| ())?;
-			Ok(sc_service_test::TestNetComponents::new(
-				task_manager,
-				client,
-				network,
-				sync,
-				transaction_pool,
-			))
-		});
-	}
-
-	#[test]
-	fn test_create_development_chain_spec() {
-		development_config().build_storage().unwrap();
-	}
-
-	#[test]
-	fn test_create_local_testnet_chain_spec() {
-		local_testnet_config().build_storage().unwrap();
-	}
-
-	#[test]
-	fn test_staging_test_net_chain_spec() {
-		staging_testnet_config().build_storage().unwrap();
-	}
 }

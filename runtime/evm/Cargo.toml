@@ -1,5 +1,5 @@
 [package]
-name = "node-template-runtime"
+name = "evm-node-runtime"
 version = "3.0.0"
 authors.workspace = true
 description = "Substrate node kitchensink runtime. (polkadot v1.15.0)"
@@ -26,7 +26,6 @@ scale-info = { features = ["derive", "serde"], workspace = true }
 static_assertions = { workspace = true, default-features = true }
 log = { workspace = true }
 serde_json = { features = ["alloc", "arbitrary_precision"], workspace = true }
-hex-literal = { workspace = true }
 
 # pallet-asset-conversion: turn on "num-traits" feature
 primitive-types = { features = [
@@ -61,6 +60,9 @@ pallet-evm-precompile-dispatch = { workspace = true }
 pallet-evm-precompile-modexp = { workspace = true }
 pallet-evm-precompile-sha3fips = { workspace = true }
 pallet-evm-precompile-simple = { workspace = true }
+
+pallet-grandpa = { workspace = true }
+
 # pallet-evm-precompile-storage-cleaner = { workspace = true }
 precompile-utils = { workspace = true }
 
@@ -91,7 +93,7 @@ std = [
 	"pallet-base-fee/std",
 	"pallet-dynamic-fee/std",
 
-	# "pallet-evm-chain-id/std",
+	"pallet-evm-chain-id/std",
 	"pallet-ethereum/std",
 	# "pallet-evm-precompile-author-mapping/std",
 	# "pallet-evm-precompile-balances-erc20/std",
@@ -108,6 +110,7 @@ std = [
 	# "pallet-evm-precompile-storage-cleaner/std",
 	# "pallet-evm-precompile-p256verify/std",
 	"pallet-evm/std",
+	"pallet-grandpa/std",
 
 	"precompile-utils/std",
 

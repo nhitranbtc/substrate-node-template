@@ -34,13 +34,17 @@
 /// Development node support.
 pub mod local;
 
+/// Parachain node support.
+pub mod parachain;
+
 //#[cfg(feature = "runtime-benchmarks")]
-mod benchmarking;
+// mod benchmarking;
 
 mod cli;
-mod command;
 mod evm_tracing_types;
 mod rpc;
+mod command;
+
 
 pub use cli::*;
 pub use command::*;

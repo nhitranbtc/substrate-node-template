@@ -31,16 +31,19 @@
 #![warn(missing_docs)]
 #![warn(unused_crate_dependencies)]
 use polkadot_sdk::*;
-
+use fc_rpc::{
+    Eth, EthApiServer, EthBlockDataCacheTask, EthFilter, EthFilterApiServer, EthPubSub,
+    EthPubSubApiServer, Net, NetApiServer, Web3, Web3ApiServer,
+};
+use fc_rpc_core::types::{FeeHistoryCache, FilterPool};
+use fc_storage::StorageOverride;
 use std::sync::Arc;
-
 use jsonrpsee::RpcModule;
 use node_primitives::{AccountId, Balance, Block, BlockNumber, Hash, Nonce};
 use sc_client_api::AuxStore;
 use sc_consensus_babe::BabeWorkerHandle;
-use sc_consensus_beefy::communication::notification::{
-	BeefyBestBlockStream, BeefyVersionedFinalityProofStream,
-};
+
+
 use sc_consensus_grandpa::{
 	FinalityProofProvider, GrandpaJustificationStream, SharedAuthoritySet, SharedVoterState,
 };
@@ -53,8 +56,30 @@ use sp_block_builder::BlockBuilder;
 use sp_blockchain::{Error as BlockChainError, HeaderBackend, HeaderMetadata};
 use sp_consensus::SelectChain;
 use sp_consensus_babe::BabeApi;
-use sp_consensus_beefy::AuthorityIdBound;
 use sp_keystore::KeystorePtr;
+
+// TODO This is copied from frontier. It should be imported instead after
+// https://github.com/paritytech/frontier/issues/333 is solved
+pub fn open_frontier_backend<C>(
+    client: Arc<C>,
+    config: &sc_service::Configuration,
+) -> Result<Arc<fc_db::kv::Backend<Block, C>>, String>
+where
+    C: sp_blockchain::HeaderBackend<Block>,
+{
+    let config_dir = config.base_path.config_dir(config.chain_spec.id());
+    let path = config_dir.join("frontier").join("db");
+
+    Ok(Arc::new(fc_db::kv::Backend::<Block, C>::new(
+        client,
+        &fc_db::kv::DatabaseSettings {
+            source: fc_db::DatabaseSource::RocksDb {
+                path,
+                cache_size: 0,
+            },
+        },
+    )?))
+}
 
 /// Extra dependencies for BABE.
 pub struct BabeDeps {
@@ -78,18 +103,9 @@ pub struct GrandpaDeps<B> {
 	pub finality_provider: Arc<FinalityProofProvider<B, Block>>,
 }
 
-/// Dependencies for BEEFY
-pub struct BeefyDeps<AuthorityId: AuthorityIdBound> {
-	/// Receives notifications about finality proof events from BEEFY.
-	pub beefy_finality_proof_stream: BeefyVersionedFinalityProofStream<Block, AuthorityId>,
-	/// Receives notifications about best block events from BEEFY.
-	pub beefy_best_block_stream: BeefyBestBlockStream<Block>,
-	/// Executor to drive the subscription manager in the BEEFY RPC handler.
-	pub subscription_executor: SubscriptionTaskExecutor,
-}
 
 /// Full client dependencies.
-pub struct FullDeps<C, P, SC, B, AuthorityId: AuthorityIdBound> {
+pub struct FullDeps<C, P, SC, B, > {
 	/// The client instance to use.
 	pub client: Arc<C>,
 	/// Transaction pool instance.
@@ -100,32 +116,25 @@ pub struct FullDeps<C, P, SC, B, AuthorityId: AuthorityIdBound> {
 	pub deny_unsafe: DenyUnsafe,
 	/// BABE specific dependencies.
 	pub babe: BabeDeps,
-	/// GRANDPA specific dependencies.
-	pub grandpa: GrandpaDeps<B>,
-	/// BEEFY specific dependencies.
-	pub beefy: BeefyDeps<AuthorityId>,
 	/// Shared statement store reference.
 	pub statement_store: Arc<dyn sp_statement_store::StatementStore>,
 	/// The backend used by the node.
 	pub backend: Arc<B>,
-	/// Mixnet API.
-	pub mixnet_api: Option<sc_mixnet::Api>,
+
 }
 
 /// Instantiate all Full RPC extensions.
-pub fn create_full<C, P, SC, B, AuthorityId>(
+pub fn create_full<C, P, SC, B, >(
 	FullDeps {
 		client,
 		pool,
 		select_chain,
 		deny_unsafe,
 		babe,
-		grandpa,
-		beefy,
 		statement_store,
 		backend,
-		mixnet_api,
-	}: FullDeps<C, P, SC, B, AuthorityId>,
+
+	}: FullDeps<C, P, SC, B, >,
 ) -> Result<RpcModule<()>, Box<dyn std::error::Error + Send + Sync>>
 where
 	C: ProvideRuntimeApi<Block>
@@ -145,13 +154,11 @@ where
 	SC: SelectChain<Block> + 'static,
 	B: sc_client_api::Backend<Block> + Send + Sync + 'static,
 	B::State: sc_client_api::backend::StateBackend<sp_runtime::traits::HashingFor<Block>>,
-	AuthorityId: AuthorityIdBound,
-	<AuthorityId as RuntimeAppPublic>::Signature: Send + Sync,
 {
 	use mmr_rpc::{Mmr, MmrApiServer};
 	use pallet_transaction_payment_rpc::{TransactionPayment, TransactionPaymentApiServer};
 	use sc_consensus_babe_rpc::{Babe, BabeApiServer};
-	use sc_consensus_beefy_rpc::{Beefy, BeefyApiServer};
+
 	use sc_consensus_grandpa_rpc::{Grandpa, GrandpaApiServer};
 	use sc_rpc::{
 		dev::{Dev, DevApiServer},
@@ -166,13 +173,7 @@ where
 	let mut io = RpcModule::new(());
 
 	let BabeDeps { keystore, babe_worker_handle } = babe;
-	let GrandpaDeps {
-		shared_voter_state,
-		shared_authority_set,
-		justification_stream,
-		subscription_executor,
-		finality_provider,
-	} = grandpa;
+
 
 	io.merge(System::new(client.clone(), pool, deny_unsafe).into_rpc())?;
 	// Making synchronous calls in light client freezes the browser currently,
@@ -192,36 +193,8 @@ where
 		Babe::new(client.clone(), babe_worker_handle.clone(), keystore, select_chain, deny_unsafe)
 			.into_rpc(),
 	)?;
-
-	io.merge(
-		Grandpa::new(
-			subscription_executor,
-			shared_authority_set.clone(),
-			shared_voter_state,
-			justification_stream,
-			finality_provider,
-		)
-		.into_rpc(),
-	)?;
 	io.merge(StateMigration::new(client.clone(), backend, deny_unsafe).into_rpc())?;
 	io.merge(Dev::new(client, deny_unsafe).into_rpc())?;
-	let statement_store =
-		sc_rpc::statement::StatementStore::new(statement_store, deny_unsafe).into_rpc();
-	io.merge(statement_store)?;
-
-	if let Some(mixnet_api) = mixnet_api {
-		let mixnet = sc_rpc::mixnet::Mixnet::new(mixnet_api).into_rpc();
-		io.merge(mixnet)?;
-	}
-
-	io.merge(
-		Beefy::<Block, AuthorityId>::new(
-			beefy.beefy_finality_proof_stream,
-			beefy.beefy_best_block_stream,
-			beefy.subscription_executor,
-		)?
-		.into_rpc(),
-	)?;
 
 	Ok(io)
 }

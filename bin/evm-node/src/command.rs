@@ -18,18 +18,21 @@
 
 use polkadot_sdk::*;
 
+
 use crate::{
 	cli::{Cli, Subcommand},
+	local,
+
 	local::{
-		chain_spec, service,
-		service::{new_partial, FullClient},
+		chain_spec,
 	},
 };
+
 
 #[cfg(feature = "runtime-benchmarks")]
 use frame_benchmarking_cli::*;
 use node_primitives::Block;
-use node_template_runtime::{ExistentialDeposit, RuntimeApi};
+use evm_node_runtime::{ExistentialDeposit, RuntimeApi};
 use sc_cli::{Result, SubstrateCli};
 use sc_service::PartialComponents;
 use sp_keyring::Sr25519Keyring;
@@ -80,6 +83,7 @@ impl SubstrateCli for Cli {
 	}
 }
 
+
 /// Parse command line arguments into service configuration.
 pub fn run() -> Result<()> {
 	let cli = Cli::from_args();
@@ -87,8 +91,27 @@ pub fn run() -> Result<()> {
 	match &cli.subcommand {
 		None => {
 			let runner = cli.create_runner(&cli.run)?;
+
+			// let evm_tracing_config = EvmTracingConfig {
+            //     ethapi: cli.eth_api_options.ethapi,
+            //     ethapi_max_permits: cli.eth_api_options.ethapi_max_permits,
+            //     ethapi_trace_max_count: cli.eth_api_options.ethapi_trace_max_count,
+            //     ethapi_trace_cache_duration: cli.eth_api_options.ethapi_trace_cache_duration,
+            //     eth_log_block_cache: cli.eth_api_options.eth_log_block_cache,
+            //     eth_statuses_cache: cli.eth_api_options.eth_statuses_cache,
+            //     max_past_logs: cli.eth_api_options.max_past_logs,
+            //     tracing_raw_max_memory_usage: cli.eth_api_options.tracing_raw_max_memory_usage,
+            // };
+
 			runner.run_node_until_exit(|config| async move {
-				service::new_full(config, cli).map_err(sc_cli::Error::Service)
+				//service::new_full(config, cli).map_err(sc_cli::Error::Service)
+
+				local::start_node::<sc_network::NetworkWorker<_, _>>(
+                        config,
+                        //evm_tracing_config,
+                    )
+                    .map_err(Into::into)
+
 			})
 		},
 		Some(Subcommand::Inspect(cmd)) => {
@@ -121,7 +144,7 @@ pub fn run() -> Result<()> {
 			},
 			BenchmarkCmd::Block(cmd) => {
 				// ensure that we keep the task manager alive
-				let partial = new_partial(&config)?;
+				let partial = local::new_partial(&config)?;
 				cmd.run(partial.client)
 			},
 			#[cfg(not(feature = "runtime-benchmarks"))]
@@ -132,7 +155,7 @@ pub fn run() -> Result<()> {
 			#[cfg(feature = "runtime-benchmarks")]
 			BenchmarkCmd::Storage(cmd) => {
 				// ensure that we keep the task manager alive
-				let partial = new_partial(&config)?;
+				let partial = local::new_partial(&config)?;
 				let db = partial.backend.expose_db();
 				let storage = partial.backend.expose_storage();
 
@@ -140,7 +163,7 @@ pub fn run() -> Result<()> {
 			},
 		BenchmarkCmd::Overhead(cmd) => {
 			// ensure that we keep the task manager alive
-			let partial = new_partial(&config)?;
+			let partial = local::new_partial(&config)?;
 			let ext_builder = RemarkBuilder::new(partial.client.clone());
 
 			cmd.run(
@@ -153,7 +176,7 @@ pub fn run() -> Result<()> {
 		},
 		BenchmarkCmd::Extrinsic(cmd) => {
 			// ensure that we keep the task manager alive
-			let partial = service::new_partial(&config)?;
+			let partial = service::local::new_partial(&config)?;
 			// Register the *Remark* and *TKA* builders.
 			let ext_factory = ExtrinsicFactory(vec![
 				Box::new(RemarkBuilder::new(partial.client.clone())),
@@ -189,21 +212,21 @@ pub fn run() -> Result<()> {
 			let runner = cli.create_runner(cmd)?;
 			runner.async_run(|config| {
 				let PartialComponents { client, task_manager, import_queue, .. } =
-					new_partial(&config)?;
+					local::new_partial(&config)?;
 				Ok((cmd.run(client, import_queue), task_manager))
 			})
 		},
 		Some(Subcommand::ExportBlocks(cmd)) => {
 			let runner = cli.create_runner(cmd)?;
 			runner.async_run(|config| {
-				let PartialComponents { client, task_manager, .. } = new_partial(&config)?;
+				let PartialComponents { client, task_manager, .. } = local::new_partial(&config)?;
 				Ok((cmd.run(client, config.database), task_manager))
 			})
 		},
 		Some(Subcommand::ExportState(cmd)) => {
 			let runner = cli.create_runner(cmd)?;
 			runner.async_run(|config| {
-				let PartialComponents { client, task_manager, .. } = new_partial(&config)?;
+				let PartialComponents { client, task_manager, .. } = local::new_partial(&config)?;
 				Ok((cmd.run(client, config.chain_spec), task_manager))
 			})
 		},
@@ -211,7 +234,7 @@ pub fn run() -> Result<()> {
 			let runner = cli.create_runner(cmd)?;
 			runner.async_run(|config| {
 				let PartialComponents { client, task_manager, import_queue, .. } =
-					new_partial(&config)?;
+					local::new_partial(&config)?;
 				Ok((cmd.run(client, import_queue), task_manager))
 			})
 		},
@@ -223,9 +246,8 @@ pub fn run() -> Result<()> {
 			let runner = cli.create_runner(cmd)?;
 			runner.async_run(|config| {
 				let PartialComponents { client, task_manager, backend, .. } =
-					new_partial(&config)?;
-				let aux_revert = Box::new(|client: Arc<FullClient>, backend, blocks| {
-					sc_consensus_babe::revert(client.clone(), backend, blocks)?;
+					local::new_partial(&config)?;
+				let aux_revert = Box::new(|client: Arc<local::FullClient>, _, blocks| {
 					sc_consensus_grandpa::revert(client, blocks)?;
 					Ok(())
 				});

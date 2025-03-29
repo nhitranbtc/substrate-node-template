@@ -1,12 +1,12 @@
 [package]
-name = "substrate-node-template"
+name = "evm-node"
 version = "3.0.0"
 authors.workspace = true
 description = "Generic Substrate node implementation in Rust. (polkadot v1.15.0)"
 build = "build.rs"
 edition.workspace = true
 license = "GPL-3.0-or-later WITH Classpath-exception-2.0"
-default-run = "substrate-node-template"
+default-run = "evm-node"
 homepage = "https://substrate.io"
 repository.workspace = true
 publish = false
@@ -28,7 +28,7 @@ is-it-maintained-issue-resolution = { repository = "paritytech/polkadot-sdk" }
 is-it-maintained-open-issues = { repository = "paritytech/polkadot-sdk" }
 
 [[bin]]
-name = "substrate-node-template"
+name = "evm-node"
 path = "bin/main.rs"
 
 [lib]
@@ -36,6 +36,8 @@ crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 # third-party dependencies
+async-trait = { workspace = true }
+hex-literal = { workspace = true }
 array-bytes = { workspace = true, default-features = true }
 clap = { features = ["derive"], optional = true, workspace = true }
 codec = { workspace = true, default-features = true }
@@ -49,7 +51,7 @@ tokio = { workspace = true }
 polkadot-sdk = { features = [
     "node",
 ], workspace = true, default-features = true }
-node-template-runtime.workspace = true
+evm-node-runtime.workspace = true
 node-primitives.workspace = true
 node-primitives.default-features = true
 node-inspect = { optional = true, workspace = true, default-features = true }
@@ -188,8 +190,8 @@ default = [
 
 
 runtime-benchmarks = [
-    "node-template-runtime/runtime-benchmarks",
+    "evm-node-runtime/runtime-benchmarks",
     "node-inspect?/runtime-benchmarks",
     "polkadot-sdk/runtime-benchmarks",
 ]
-try-runtime = ["node-template-runtime/try-runtime", "polkadot-sdk/try-runtime"]
+try-runtime = ["evm-node-runtime/try-runtime", "polkadot-sdk/try-runtime"]

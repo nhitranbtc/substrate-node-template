@@ -1,8 +1,10 @@
 [workspace]
 members = [
     "bin/substrate-node",
+    "bin/evm-node",
     "primitives",
     "runtime/development",
+    "runtime/evm",
     "vendor/evm-tracing",
     "vendor/primitives/debug",
     "vendor/primitives/evm-tracing-events",
@@ -182,6 +184,7 @@ sc-consensus-beefy-rpc = { default-features = false, git = "https://github.com/p
 sc-consensus-grandpa = { default-features = false, package = "sc-consensus-grandpa", git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
 sc-consensus-grandpa-rpc = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
 sc-client-api = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
+sc-client-db = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
 sc-rpc-api = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
 sc-rpc-spec-v2 = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
 sc-basic-authorship = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
@@ -190,6 +193,11 @@ sc-authority-discovery = { default-features = false, git = "https://github.com/p
 sc-chain-spec = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
 sc-sync-state-rpc = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
 sc-consensus-slots = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
+sc-consensus-manual-seal = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
+sc-offchain = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
+sc-sysinfo = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
+sc-tracing = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
+
 sp-consensus = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
 sp-timestamp = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
 sp-keyring = { default-features = false, git = "https://github.com/paritytech/polkadot-sdk", branch = "stable2407" }
@@ -354,29 +362,35 @@ pallet-evm-precompile-modexp = { git = "https://github.com/AstarNetwork/frontier
 pallet-evm-precompile-sha3fips = { git = "https://github.com/AstarNetwork/frontier", branch = "stable2407", default-features = false }
 pallet-evm-precompile-simple = { git = "https://github.com/AstarNetwork/frontier", branch = "stable2407", default-features = false }
 pallet-base-fee = { git = "https://github.com/AstarNetwork/frontier", branch = "stable2407", default-features = false }
+pallet-dynamic-fee = { git = "https://github.com/AstarNetwork/frontier", branch = "stable2407", default-features = false }
 pallet-evm-chain-id = { git = "https://github.com/AstarNetwork/frontier", branch = "stable2407", default-features = false }
 fp-evm = { git = "https://github.com/AstarNetwork/frontier", branch = "stable2407", default-features = false }
 fp-ethereum = { git = "https://github.com/AstarNetwork/frontier", branch = "stable2407", default-features = false }
+fp-dynamic-fee = { git = "https://github.com/AstarNetwork/frontier", branch = "stable2407", default-features = false }
 precompile-utils = { git = "https://github.com/AstarNetwork/frontier", branch = "stable2407", default-features = false }
 
 
 # (native)
-fc-consensus = { git = "https://github.com/AstarNetwork/frontier", branch = "stable2407" }
-fc-db = { git = "https://github.com/AstarNetwork/frontier", branch = "stable2407" }
-fc-api = { git = "https://github.com/AstarNetwork/frontier", branch = "stable2407" }
-fc-mapping-sync = { git = "https://github.com/AstarNetwork/frontier", branch = "stable2407" }
+fc-consensus = { git = "https://github.com/AstarNetwork/frontier", branch = "stable2407", default-features = false }
+fc-db = { git = "https://github.com/AstarNetwork/frontier", branch = "stable2407", default-features = false }
+fc-api = { git = "https://github.com/AstarNetwork/frontier", branch = "stable2407", default-features = false }
+fc-mapping-sync = { git = "https://github.com/AstarNetwork/frontier", branch = "stable2407", default-features = false }
 fc-rpc = { git = "https://github.com/AstarNetwork/frontier", branch = "stable2407", features = [
     "rpc-binary-search-estimate",
     "txpool",
 ] }
-fc-rpc-core = { git = "https://github.com/AstarNetwork/frontier", branch = "stable2407" }
-fp-consensus = { git = "https://github.com/AstarNetwork/frontier", branch = "stable2407" }
-fp-storage = { git = "https://github.com/AstarNetwork/frontier", branch = "stable2407" }
-fc-storage = { git = "https://github.com/AstarNetwork/frontier", branch = "stable2407" }
+
+fc-rpc-core = { git = "https://github.com/AstarNetwork/frontier", branch = "stable2407", default-features = false }
+fp-consensus = { git = "https://github.com/AstarNetwork/frontier", branch = "stable2407", default-features = false }
+fp-storage = { git = "https://github.com/AstarNetwork/frontier", branch = "stable2407", default-features = false }
+fp-account = { git = "https://github.com/AstarNetwork/frontier", branch = "stable2407", default-features = false }
+fc-storage = { git = "https://github.com/AstarNetwork/frontier", branch = "stable2407", default-features = false }
+fc-cli = { git = "https://github.com/AstarNetwork/frontier", branch = "stable2407", default-features = false }
 
 
 # Local Runtime
 node-template-runtime = { path = "./runtime/development" }
+evm-node-runtime = { path = "./runtime/evm" }
 runtime-common = { path = "./runtime/common", default-features = false }
 # Default
 node-inspect = { path = "./bin/substrate-node/inspect", package = "staging-node-inspect" }
